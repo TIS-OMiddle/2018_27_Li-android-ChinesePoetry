@@ -7,5 +7,26 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    
+    <style name="TransTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="UserID">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="bt_back">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:text">←</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:left">5dp</item>
+        <item name="android:bottom">10dp</item>
+    </style>
 
 </resources>

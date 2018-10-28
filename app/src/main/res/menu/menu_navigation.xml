@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single"
+        android:id="@+id/gp1">
+        <item
+            android:id="@+id/menu_item_poetry"
+            android:title="唐诗"/>
+        <item
+            android:id="@+id/menu_item_poetry_author"
+            android:title="唐诗作者"/>
+    </group>
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/gp2">
+        <item
+            android:id="@+id/menu_item_star"
+            android:title="唐诗收藏"/>
+    </group>
+
+</menu>

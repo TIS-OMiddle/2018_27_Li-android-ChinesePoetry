@@ -1,18 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+        <!--状态栏和主页布局-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <!--状态栏-->
+            <android.support.v7.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/actionBar">
+                <Button
+                    android:id="@+id/bt_nav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="汉堡"/>
+                <Button
+                    android:id="@+id/bt_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="搜索"/>
+            </android.support.v7.widget.Toolbar>
+            <!--主页-->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="主页"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <!--左侧导航-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:layout_gravity="start">
+
+            <!--导航栏-->
+            <android.support.design.widget.NavigationView
+                android:id="@+id/navigation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/my_navi_body"
+                app:insetForeground="@android:color/transparent"
+                app:headerLayout="@layout/header"
+                app:menu="@menu/menu_navigation">
+            </android.support.design.widget.NavigationView>
+
+        </LinearLayout>
+
+        <!--右侧搜索-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:layout_marginLeft="-65dp"
+            android:orientation="vertical"
+            android:layout_gravity="end">
+            <Button
+                android:id="@+id/bt_search_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/bt_back"
+                />
+        </LinearLayout>
+
+
+    </android.support.v4.widget.DrawerLayout>
+</FrameLayout>
