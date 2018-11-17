@@ -180,6 +180,7 @@ fabric.properties
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
+chinese-poetry-api-0.0.1-SNAPSHOT.jar
 
 
 # End of https://www.gitignore.io/api/android,androidstudio

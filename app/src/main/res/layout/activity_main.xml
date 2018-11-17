@@ -12,46 +12,63 @@
         android:layout_height="match_parent">
 
         <!--状态栏和主页布局-->
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <!--状态栏-->
-            <android.support.v7.widget.Toolbar
+            android:layout_height="match_parent">
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/actionBar">
-                <Button
-                    android:id="@+id/bt_nav"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="汉堡"/>
-                <Button
-                    android:id="@+id/bt_search"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="搜索"/>
-            </android.support.v7.widget.Toolbar>
-            <!--主页-->
-            <FrameLayout
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <!--状态栏-->
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@color/actionBar">
+
+                    <Button
+                        android:id="@+id/bt_nav"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="汉堡" />
+
+                    <Button
+                        android:id="@+id/bt_search"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="搜索" />
+                </android.support.v7.widget.Toolbar>
+                <!--主页-->
+                <FrameLayout
+                    android:id="@+id/main_frame"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/main_frame_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="主页" />
+                </FrameLayout>
+            </LinearLayout>
+            <!--搜索-->
+            <com.miguelcatalan.materialsearchview.MaterialSearchView
+                android:id="@+id/search_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="主页"/>
-            </FrameLayout>
-        </LinearLayout>
+                android:layout_height="wrap_content" />
+
+
+        </FrameLayout>
 
         <!--左侧导航-->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_gravity="start"
             android:clickable="true"
-            android:layout_gravity="start">
+            android:orientation="vertical">
 
             <!--导航栏-->
             <android.support.design.widget.NavigationView
@@ -59,28 +76,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/my_navi_body"
-                app:insetForeground="@android:color/transparent"
                 app:headerLayout="@layout/header"
-                app:menu="@menu/menu_navigation">
-            </android.support.design.widget.NavigationView>
+                app:insetForeground="@android:color/transparent"
+                app:menu="@menu/menu_navigation"></android.support.design.widget.NavigationView>
 
         </LinearLayout>
 
         <!--右侧搜索-->
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
+            android:layout_gravity="end"
             android:layout_marginLeft="-65dp"
-            android:orientation="vertical"
-            android:layout_gravity="end">
-            <Button
-                android:id="@+id/bt_search_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/bt_back"
-                />
-        </LinearLayout>
+            android:background="@android:color/white"
+            android:orientation="vertical">
+
+        </FrameLayout>
 
 
     </android.support.v4.widget.DrawerLayout>
