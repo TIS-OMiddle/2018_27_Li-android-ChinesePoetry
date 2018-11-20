@@ -5,6 +5,13 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="actionBar">#dfac53</color>
+
+    <!--左侧导航-->
     <color name="my_navi_head">#e8dc30</color>
     <color name="my_navi_body">#f7e818</color>
+
+    <!--刷新布局-->
+    <color name="my_refresh_primary">#9eadbd</color>
+    <color name="my_refresh_accent">#6c9ccb</color>
+
 </resources>

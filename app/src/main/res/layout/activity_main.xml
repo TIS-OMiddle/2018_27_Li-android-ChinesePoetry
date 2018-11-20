@@ -11,55 +11,79 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--状态栏和主页布局-->
+        <!--工具栏+主页+搜索栏-->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <LinearLayout
+
+            <!--工具栏-->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <!--状态栏-->
+                android:layout_height="?attr/actionBarSize">
+
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:background="@color/actionBar">
 
-                    <Button
-                        android:id="@+id/bt_nav"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:text="汉堡" />
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-                    <Button
-                        android:id="@+id/bt_search"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:text="搜索" />
+                        <Button
+                            android:id="@+id/bt_nav"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:text="汉堡" />
+                        <!--暂时保留-->
+                        <Button
+                            android:id="@+id/bt_search"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="center"
+                            android:text="搜索" />
+                    </RelativeLayout>
                 </android.support.v7.widget.Toolbar>
-                <!--主页-->
+
+                <TextView
+                    android:id="@+id/tv_toolbar_title"
+                    style="@style/tv_toolbar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="唐诗" />
+            </FrameLayout>
+
+
+            <!--主页-->
+            <com.scwang.smartrefresh.layout.SmartRefreshLayout
+                android:id="@+id/fg_poetry_refresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/actionBarSize"
+                app:srlAccentColor="@color/my_refresh_accent"
+                app:srlPrimaryColor="@color/my_refresh_primary">
+
+                <com.scwang.smartrefresh.header.WaveSwipeHeader
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
                 <FrameLayout
                     android:id="@+id/main_frame"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent" />
+            </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
-                    <TextView
-                        android:id="@+id/main_frame_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="主页" />
-                </FrameLayout>
-            </LinearLayout>
             <!--搜索-->
             <com.miguelcatalan.materialsearchview.MaterialSearchView
                 android:id="@+id/search_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
-
         </FrameLayout>
 
         <!--左侧导航-->

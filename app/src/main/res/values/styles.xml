@@ -7,18 +7,21 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    
+
+    <!--穿透状态栏主题-->
     <style name="TransTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <!--登陆显示，字体-->
     <style name="UserID">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <!--返回按钮，字体-->
     <style name="bt_back">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:textSize">30sp</item>
@@ -27,6 +30,27 @@
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:left">5dp</item>
         <item name="android:bottom">10dp</item>
+    </style>
+
+    <!--工具栏，标题字体-->
+    <style name="tv_toolbar_title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!--唐诗，标题字体-->
+    <style name="poetry_title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!--唐诗，内容字体-->
+    <style name="poetry_content_fade" parent="poetry_title">
+        <item name="android:ems">1</item>
+        <item name="animationDuration">1500</item>
+        <item name="android:lineSpacingExtra">10dp</item>
     </style>
 
 </resources>

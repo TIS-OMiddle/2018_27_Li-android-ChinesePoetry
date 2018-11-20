@@ -29,4 +29,8 @@ dependencies {
     api 'com.miguelcatalan:materialsearchview:1.4.0'
     api group: 'com.alibaba', name: 'fastjson', version: '1.2.39'
     api 'com.loopj.android:android-async-http:1.4.9'
+    api group: 'com.hanks', name: 'htextview-base', version: '0.1.6'
+    api group: 'com.hanks', name: 'htextview-fade', version: '0.1.6'
+    api 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-14'
+    api 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0-alpha-14'
 }
