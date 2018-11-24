@@ -53,4 +53,9 @@
         <item name="android:lineSpacingExtra">10dp</item>
     </style>
 
+    <!--宋词，内容字体-->
+    <style name="poem_content" parent="poetry_title">
+        <item name="android:lineSpacingExtra">10dp</item>
+    </style>
+
 </resources>

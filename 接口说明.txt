@@ -1,0 +1,14 @@
+api/poetry
+可选参数（按顺序覆盖）：
+string id：精确返回对应ID的唐诗（集合，但length始终为1）
+string title：返回所有含有title的标题唐诗（集合）
+string author_name：同上（集合）
+string author_id：精确返回对应作者ID的唐诗（集合）
+
+api/poetry-author
+string id：精确返回对应ID的唐诗（集合，但length始终为1）
+string name：返回所有含有name的人（集合）
+
+api/poem
+string id：精确返回对应ID的宋词（集合，但length始终为1）
+string title：返回所有含有title的标题宋词（集合）

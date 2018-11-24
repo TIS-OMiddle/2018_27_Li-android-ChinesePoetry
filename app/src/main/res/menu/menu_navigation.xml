@@ -6,15 +6,18 @@
             android:id="@+id/menu_item_poetry"
             android:title="唐诗"/>
         <item
-            android:id="@+id/menu_item_poetry_author"
-            android:title="唐诗作者"/>
+            android:id="@+id/menu_item_poem"
+            android:title="宋词"/>
+        <item
+            android:id="@+id/menu_item_author"
+            android:title="作者"/>
     </group>
 
     <group android:checkableBehavior="single"
         android:id="@+id/gp2">
         <item
             android:id="@+id/menu_item_star"
-            android:title="唐诗收藏"/>
+            android:title="收藏"/>
     </group>
 
 </menu>

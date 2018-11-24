@@ -32,34 +32,49 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.edu.scnu.ljh.chinesepoetry.entity.Poem;
 import cn.edu.scnu.ljh.chinesepoetry.entity.Poetry;
+import cn.edu.scnu.ljh.chinesepoetry.entity.PoetryAuthor;
+import cn.edu.scnu.ljh.chinesepoetry.entity.Star;
+import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentPoem;
 import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentPoetry;
-import cn.edu.scnu.ljh.chinesepoetry.service.PoetryClient;
+import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentAuthor;
+import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentStar;
+import cn.edu.scnu.ljh.chinesepoetry.service.AsyncClient;
+import cn.edu.scnu.ljh.chinesepoetry.service.MyHelper;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_INTERNET = 1;//网络请求值
     private static final int FRAGMENT_POETRY = 1;//唐诗页面
-    private static final int FRAGMENT_POETRY_AUTHOR = 2;//唐诗作者页面
-    private static final int FRAGMENT_STAR = 3;//收藏页面
+    private static final int FRAGMENT_POEM = 2;//宋词页面
+    private static final int FRAGMENT_AUTHOR = 3;//作者页面
+    private static final int FRAGMENT_STAR = 4;//收藏页面
     private static int FRAGMENT_CURRENT;//当前页面
-    private AsyncHttpResponseHandler poetryResponseHandler;//唐诗回应handler
+    private AsyncHttpResponseHandler responseHandler;//刷新事件显示内容handler
+
     private MyFragmentPoetry myFragmentPoetry;//唐诗fragment
+    private MyFragmentAuthor myFragmentAuthor;
+    private MyFragmentPoem myFragmentPoem;
+    private MyFragmentStar myFragmentStar;
 
     SmartRefreshLayout smartRefreshLayout;//刷新布局
     DrawerLayout drawer;//抽屉布局
     MaterialSearchView searchView;//搜索显示
     Button bt_nav;//切换显示导航
-    Button bt_search;//??
     NavigationView navigation;//导航view
     Toolbar toolbar;//工具栏
     List<Poetry> poetriesSuggestion;//搜索建议
+    List<PoetryAuthor> poetryAuthorsSuggestion;//搜索建议
+    List<Poem> poemSuggestion;//搜索建议
+    MyHelper myHelper;//数据库
     Integer order;//异步按序回调
-    TextView tv_toobal_title;//工具栏
+    TextView tv_toolbar_title;//工具栏
     Handler handler;//主线程handler
 
 
@@ -71,11 +86,11 @@ public class MainActivity extends AppCompatActivity {
         drawer = findViewById(R.id.drawer);
         searchView = findViewById(R.id.search_view);
         bt_nav = findViewById(R.id.bt_nav);
-        bt_search = findViewById(R.id.bt_search);
         navigation = findViewById(R.id.navigation);
-        tv_toobal_title = findViewById(R.id.tv_toolbar_title);
+        tv_toolbar_title = findViewById(R.id.tv_toolbar_title);
         order = 0;
         handler = new Handler();
+        myHelper = new MyHelper(this);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //toolbar设定
@@ -83,12 +98,14 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_action_navigation_arrow_back_inverted);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         init();
     }
 
     private void init() {
         //左侧菜单切换按钮
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         bt_nav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,15 +118,19 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.menu_item_poetry:
-                        tv_toobal_title.setText("唐诗");
+                        tv_toolbar_title.setText("唐诗");
                         showFragment(FRAGMENT_POETRY);
                         break;
-                    case R.id.menu_item_poetry_author:
-                        tv_toobal_title.setText("唐诗作者");
-                        showFragment(FRAGMENT_POETRY_AUTHOR);
+                    case R.id.menu_item_poem:
+                        tv_toolbar_title.setText("宋词");
+                        showFragment(FRAGMENT_POEM);
+                        break;
+                    case R.id.menu_item_author:
+                        tv_toolbar_title.setText("作者");
+                        showFragment(FRAGMENT_AUTHOR);
                         break;
                     case R.id.menu_item_star:
-                        tv_toobal_title.setText("收藏");
+                        tv_toolbar_title.setText("收藏");
                         showFragment(FRAGMENT_STAR);
                         break;
                 }
@@ -122,31 +143,51 @@ public class MainActivity extends AppCompatActivity {
         //设置初始fragment
         showFragment(FRAGMENT_POETRY);
 
+        //刷新布局显示设置
+        smartRefreshLayout.setEnableHeaderTranslationContent(false);
+
         //设置事件监听器
         initHandler();
         initRefreshListener();
         initSearchListener();
-
-        //刷新布局显示设置
-        smartRefreshLayout.setEnableHeaderTranslationContent(false);
-        smartRefreshLayout.autoRefresh();
     }
 
     //初始化监听器
     private void initHandler() {
-        poetryResponseHandler = new AsyncHttpResponseHandler() {
+        responseHandler = new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
-                    poetriesSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), Poetry.class);
-                    if (poetriesSuggestion.size() == 0) return;
-                    smartRefreshLayout.finishRefresh(1000);
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            myFragmentPoetry.setPoetry(poetriesSuggestion.get(0));
-                        }
-                    }, 1200);
+                    switch (FRAGMENT_CURRENT) {
+                        case FRAGMENT_POETRY:
+                            poetriesSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), Poetry.class);
+                            if (poetriesSuggestion.size() == 0) return;
+                            smartRefreshLayout.finishRefresh(1000);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    myFragmentPoetry.setPoetry(poetriesSuggestion.get(0));
+                                }
+                            }, 1200);
+                            break;
+                        case FRAGMENT_POEM:
+                            poemSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), Poem.class);
+                            if (poetriesSuggestion.size() == 0) return;
+                            smartRefreshLayout.finishRefresh(1000);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    myFragmentPoem.setPoem(poemSuggestion.get(0));
+                                }
+                            }, 1200);
+                            break;
+                        case FRAGMENT_AUTHOR:
+                            poetryAuthorsSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), PoetryAuthor.class);
+                            if (poetryAuthorsSuggestion.size() == 0) return;
+                            smartRefreshLayout.finishRefresh(1000);
+                            myFragmentAuthor.setPoetryAuthor(poetryAuthorsSuggestion.get(0));
+                            break;
+                    }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 } catch (Exception e) {
@@ -170,11 +211,13 @@ public class MainActivity extends AppCompatActivity {
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 switch (FRAGMENT_CURRENT) {
                     case FRAGMENT_POETRY:
-                        PoetryClient.get(null, poetryResponseHandler, 0);
+                        AsyncClient.getPoetry(null, responseHandler, 0);
                         break;
-                    case FRAGMENT_POETRY_AUTHOR:
+                    case FRAGMENT_POEM:
+                        AsyncClient.getPoem(null, responseHandler, 0);
                         break;
-                    case FRAGMENT_STAR:
+                    case FRAGMENT_AUTHOR:
+                        AsyncClient.getPoetryAuthor(null, responseHandler, 0);
                         break;
                     default:
                         break;
@@ -194,11 +237,15 @@ public class MainActivity extends AppCompatActivity {
                 switch (FRAGMENT_CURRENT) {
                     case FRAGMENT_POETRY:
                         Poetry poetry = poetriesSuggestion.get(position);
-                        PoetryClient.get(new RequestParams("id", poetry.getId()), poetryResponseHandler, order);
+                        AsyncClient.getPoetry(new RequestParams("id", poetry.getId()), responseHandler, order);
                         break;
-                    case FRAGMENT_POETRY_AUTHOR:
+                    case FRAGMENT_POEM:
+                        Poem poem = poemSuggestion.get(position);
+                        AsyncClient.getPoem(new RequestParams("id", poem.getId()), responseHandler, order);
                         break;
-                    case FRAGMENT_STAR:
+                    case FRAGMENT_AUTHOR:
+                        PoetryAuthor poetryAuthor = poetryAuthorsSuggestion.get(position);
+                        AsyncClient.getPoetryAuthor(new RequestParams("id", poetryAuthor.getId()), responseHandler, order);
                         break;
                     default:
                         break;
@@ -208,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
         });
         //搜索栏文本变化事件
         final Pattern pattern = Pattern.compile("[a-zA-Z]");
+        //本文变化回调建议handler
         final AsyncHttpResponseHandler textChangeHandler = new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -220,11 +268,34 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         }
                     }
-                    poetriesSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), Poetry.class);
-                    if (poetriesSuggestion.size() == 0) return;
-                    String[] suggs = new String[poetriesSuggestion.size()];
-                    for (int i = 0; i < poetriesSuggestion.size(); i++)
-                        suggs[i] = poetriesSuggestion.get(i).getAuthorAndTitle();
+                    String[] suggs = null;
+                    switch (FRAGMENT_CURRENT) {
+                        case FRAGMENT_POETRY:
+                            poetriesSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), Poetry.class);
+                            if (poetriesSuggestion.size() == 0) return;
+                            suggs = new String[poetriesSuggestion.size()];
+                            for (int i = 0; i < poetriesSuggestion.size(); i++)
+                                suggs[i] = poetriesSuggestion.get(i).getAuthorAndTitle();
+                            break;
+                        case FRAGMENT_POEM:
+                            poemSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), Poem.class);
+                            if (poemSuggestion.size() == 0) return;
+                            suggs = new String[poemSuggestion.size()];
+                            for (int i = 0; i < poemSuggestion.size(); i++) {
+                                suggs[i] = poemSuggestion.get(i).getAuthorAndTitle();
+                            }
+                            break;
+                        case FRAGMENT_AUTHOR:
+                            poetryAuthorsSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), PoetryAuthor.class);
+                            if (poetryAuthorsSuggestion.size() == 0) return;
+                            suggs = new String[poetryAuthorsSuggestion.size()];
+                            for (int i = 0; i < poetryAuthorsSuggestion.size(); i++)
+                                suggs[i] = poetryAuthorsSuggestion.get(i).getNameAndDynasty();
+                            break;
+                        default:
+                            break;
+                    }
+
                     searchView.setAdapter(new SearchAdapter(getApplicationContext(), suggs));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -247,15 +318,31 @@ public class MainActivity extends AppCompatActivity {
                 if (newText.length() == 0) return false;
                 Matcher matcher = pattern.matcher(newText);
                 if (matcher.find()) return false;//拦截输入法英文
+                boolean isFilter = false;
                 ++order;
 
                 switch (FRAGMENT_CURRENT) {
                     case FRAGMENT_POETRY:
-                        PoetryClient.get(new RequestParams("title", newText), textChangeHandler, order);
+                        for (int i = 0; i < poetriesSuggestion.size(); i++) {
+                            if (poetriesSuggestion.get(i).getTitle().indexOf(newText) == 0) {
+                                isFilter = true;
+                                break;
+                            }
+                        }
+                        if (!isFilter)
+                            AsyncClient.getPoetry(new RequestParams("title", newText), textChangeHandler, order);
                         break;
-                    case FRAGMENT_POETRY_AUTHOR:
-                        break;
-                    case FRAGMENT_STAR:
+                    case FRAGMENT_POEM:
+                        for (int i = 0; i < poemSuggestion.size(); i++) {
+                            if (poemSuggestion.get(i).getTitle().indexOf(newText) == 0) {
+                                isFilter = true;
+                                break;
+                            }
+                        }
+                        if (!isFilter)
+                            AsyncClient.getPoem(new RequestParams("title", newText), textChangeHandler, order);
+                    case FRAGMENT_AUTHOR:
+                        AsyncClient.getPoetryAuthor(new RequestParams("name", newText), textChangeHandler, order);
                         break;
                     default:
                         break;
@@ -309,17 +396,49 @@ public class MainActivity extends AppCompatActivity {
             case FRAGMENT_POETRY:
                 if (myFragmentPoetry == null) {
                     myFragmentPoetry = new MyFragmentPoetry();
+                    myFragmentPoetry.setMyHelper(myHelper);
+                    smartRefreshLayout.autoRefresh();
                 }
                 transaction.replace(R.id.main_frame, myFragmentPoetry);
                 break;
 
-            case FRAGMENT_POETRY_AUTHOR:
+            case FRAGMENT_POEM:
+                if (myFragmentPoem == null) {
+                    myFragmentPoem = new MyFragmentPoem();
+                    myFragmentPoem.setMyHelper(myHelper);
+                    smartRefreshLayout.autoRefresh();
+                }
+                transaction.replace(R.id.main_frame, myFragmentPoem);
+                break;
+
+            case FRAGMENT_AUTHOR:
+                if (myFragmentAuthor == null) {
+                    myFragmentAuthor = new MyFragmentAuthor();
+                    smartRefreshLayout.autoRefresh();
+                }
+                transaction.replace(R.id.main_frame, myFragmentAuthor);
                 break;
 
             case FRAGMENT_STAR:
+                if (myFragmentStar == null) {
+                    myFragmentStar = new MyFragmentStar();
+                    myFragmentStar.setMyHelper(myHelper);
+                    myFragmentStar.setActivity(this);
+                }
+                transaction.replace(R.id.main_frame, myFragmentStar);
                 break;
         }
         FRAGMENT_CURRENT = fragment_number;
         transaction.commit();
+    }
+
+    public void onStarItemClick(Star star) {
+        if (star.getType() == 1) {//唐诗
+            showFragment(FRAGMENT_POETRY);
+            AsyncClient.getPoetry(new RequestParams("id", star.getId()), responseHandler, order);
+        } else {//宋词
+            showFragment(FRAGMENT_POEM);
+            AsyncClient.getPoem(new RequestParams("id", star.getId()), responseHandler, order);
+        }
     }
 }

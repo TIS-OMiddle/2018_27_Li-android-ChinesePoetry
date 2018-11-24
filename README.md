@@ -7,3 +7,19 @@
 <br>
 转换脚本:<a href="https://github.com/KomaBeyond/chinese-poetry-mysql">chinese-poetry-mysql</a>
 <h3>后台API:</h3><a href="https://github.com/TIS-OMiddle/2018_27_Li-API-springboot">2018_27_Li-API-springboot</a> ，springboot做的简单接口
+<br>
+<br>
+<h3>todo-list:</h3>
+<ul>
+    <li><del>唐诗</del></li>
+    <li><del>宋词</del></li>
+    <li><del>作者</del></li>
+    <li><del>收藏</del></li>
+    <li><del>分fragment搜索</del></li>
+    <li><del>搜索建议</del></li>
+    <li><del>刷新随机推荐</del></li>
+    <li><del>特效</del>(仅唐诗部分)</li>
+    <li>娱乐彩蛋</li>
+    <li>调样式、背景</li>
+    <li>登陆<del>(应该不做后台了，死代码定好ui)</del></li>
+</ul>
