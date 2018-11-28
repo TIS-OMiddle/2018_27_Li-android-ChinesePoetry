@@ -18,8 +18,8 @@
     <li><del>分fragment搜索</del></li>
     <li><del>搜索建议</del></li>
     <li><del>刷新随机推荐</del></li>
-    <li><del>特效</del>(仅唐诗部分)</li>
+    <li><del>特效</del></li>
     <li>娱乐彩蛋</li>
-    <li>调样式、背景</li>
+    <li><del>调样式、背景</del></li>
     <li>登陆<del>(应该不做后台了，死代码定好ui)</del></li>
 </ul>
