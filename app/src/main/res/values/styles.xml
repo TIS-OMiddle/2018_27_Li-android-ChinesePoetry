@@ -58,4 +58,29 @@
         <item name="android:lineSpacingExtra">10dp</item>
     </style>
 
+    <!--主页，冒泡球-->
+    <style name="main_frame_grav_ball">
+        <item name="colorGenerator">
+            com.github.glomadrian.grav.generator.paint.OneColorGenerator
+        </item>
+        <item name="single_color">@color/my_gray_ball</item>
+        <item name="animationGenerators">@array/BubbleAnimations</item>
+        <item name="ball_from_size">10dp</item>
+        <item name="ball_to_size">20dp</item>
+        <item name="gravGenerator">com.github.glomadrian.grav.generator.grav.BallGenerator</item>
+        <item name="pointGenerator">
+            com.github.glomadrian.grav.generator.point.RegularPointGenerator
+        </item>
+        <item name="regular_cell_size">300</item>
+        <item name="regular_variance">200</item>
+        <item name="shake_direction">vertical</item>
+        <item name="shake_max_duration">20000</item>
+        <item name="shake_min_duration">10000</item>
+        <item name="shake_variance">500dp</item>
+        <item name="side_to_side_direction">leftToRight</item>
+        <item name="side_to_side_max_duration">10000</item>
+        <item name="side_to_side_min_duration">10000</item>
+
+    </style>
+
 </resources>

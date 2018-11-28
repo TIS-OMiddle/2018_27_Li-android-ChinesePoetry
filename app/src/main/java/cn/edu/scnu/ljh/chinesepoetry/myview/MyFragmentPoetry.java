@@ -112,6 +112,12 @@ public class MyFragmentPoetry extends Fragment {
     }
 
     public void setPoetry(Poetry poetry) {
+        if (poetry == null) {
+            setTitle("");
+            setAuthor("");
+            setContent("");
+            return;
+        }
         setTitle(poetry.getTitle());
         setAuthor(poetry.getAuthor());
         setContent(poetry.getContent());

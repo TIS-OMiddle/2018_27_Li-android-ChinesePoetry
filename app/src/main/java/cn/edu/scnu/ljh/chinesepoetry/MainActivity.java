@@ -22,10 +22,12 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.github.glomadrian.grav.GravView;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
@@ -51,6 +53,8 @@ import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentStar;
 import cn.edu.scnu.ljh.chinesepoetry.service.AsyncClient;
 import cn.edu.scnu.ljh.chinesepoetry.service.MyHelper;
 import cz.msebera.android.httpclient.Header;
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_INTERNET = 1;//网络请求值
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_AUTHOR = 3;//作者页面
     private static final int FRAGMENT_STAR = 4;//收藏页面
     private static int FRAGMENT_CURRENT;//当前页面
+    private int debug_pause = 1200;
     private AsyncHttpResponseHandler responseHandler;//刷新事件显示内容handler
 
     private MyFragmentPoetry myFragmentPoetry;//唐诗fragment
@@ -80,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_toolbar_title;//工具栏
     Handler handler;//主线程handler
     FrameLayout mainFrame;//主页
+    GravView gv;//特效球
+    GifImageView imgLoading;
 
 
     @Override
@@ -96,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         handler = new Handler();
         myHelper = new MyHelper(this);
         mainFrame = findViewById(R.id.main_frame);
+        gv = findViewById(R.id.grav_view);
+        imgLoading = findViewById(R.id.img_loading);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //toolbar设定
@@ -123,19 +132,15 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.menu_item_poetry:
-                        tv_toolbar_title.setText("唐诗");
                         showFragment(FRAGMENT_POETRY);
                         break;
                     case R.id.menu_item_poem:
-                        tv_toolbar_title.setText("宋词");
                         showFragment(FRAGMENT_POEM);
                         break;
                     case R.id.menu_item_author:
-                        tv_toolbar_title.setText("作者");
                         showFragment(FRAGMENT_AUTHOR);
                         break;
                     case R.id.menu_item_star:
-                        tv_toolbar_title.setText("收藏");
                         showFragment(FRAGMENT_STAR);
                         break;
                 }
@@ -161,6 +166,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 backgroundTransition();
+//                //防卡机
+//                gv.setVisibility(View.INVISIBLE);
+//                handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mainFrame.setBackground(getDrawable(bg[bg_iter % 3]));
+//                        gv.setVisibility(View.VISIBLE);
+//                    }
+//                }, 2200);
             }
         });
     }
@@ -169,14 +183,15 @@ public class MainActivity extends AppCompatActivity {
     //主页背景概率变换
     private int bg[] = new int[]{R.drawable.bg1, R.drawable.bg2, R.drawable.bg3};
     private int bg_iter = 0;
+
     private void backgroundTransition() {
         if (rand.nextFloat() < 1) {
             TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{
                     getDrawable(bg[(bg_iter++) % 3]),
                     getDrawable(bg[(bg_iter) % 3])
             });
+            transitionDrawable.startTransition(2000);
             mainFrame.setBackground(transitionDrawable);
-            transitionDrawable.startTransition(3000);
         }
     }
 
@@ -195,8 +210,9 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     myFragmentPoetry.setPoetry(poetriesSuggestion.get(0));
+                                    imgLoading.setVisibility(View.INVISIBLE);
                                 }
-                            }, 1200);
+                            }, debug_pause);
                             break;
                         case FRAGMENT_POEM:
                             poemSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), Poem.class);
@@ -206,14 +222,16 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     myFragmentPoem.setPoem(poemSuggestion.get(0));
+                                    imgLoading.setVisibility(View.INVISIBLE);
                                 }
-                            }, 1200);
+                            }, debug_pause);
                             break;
                         case FRAGMENT_AUTHOR:
                             poetryAuthorsSuggestion = JSON.parseArray(new String(responseBody, "UTF-8"), PoetryAuthor.class);
                             if (poetryAuthorsSuggestion.size() == 0) return;
                             smartRefreshLayout.finishRefresh(1000);
                             myFragmentAuthor.setPoetryAuthor(poetryAuthorsSuggestion.get(0));
+                            imgLoading.setVisibility(View.INVISIBLE);
                             break;
                     }
                 } catch (UnsupportedEncodingException e) {
@@ -227,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 smartRefreshLayout.finishRefresh();
                 Toast.makeText(getApplicationContext(), "网络异常", Toast.LENGTH_SHORT).show();
+                imgLoading.setVisibility(View.INVISIBLE);
             }
         };
     }
@@ -237,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
         smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                debug_pause = 1200;
                 switch (FRAGMENT_CURRENT) {
                     case FRAGMENT_POETRY:
                         AsyncClient.getPoetry(null, responseHandler, 0);
@@ -262,14 +282,17 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                debug_pause = 2200;
                 switch (FRAGMENT_CURRENT) {
                     case FRAGMENT_POETRY:
                         Poetry poetry = poetriesSuggestion.get(position);
                         AsyncClient.getPoetry(new RequestParams("id", poetry.getId()), responseHandler, order);
+                        myFragmentPoetry.setPoetry(null);
                         break;
                     case FRAGMENT_POEM:
                         Poem poem = poemSuggestion.get(position);
                         AsyncClient.getPoem(new RequestParams("id", poem.getId()), responseHandler, order);
+                        myFragmentPoem.setPoem(null);
                         break;
                     case FRAGMENT_AUTHOR:
                         PoetryAuthor poetryAuthor = poetryAuthorsSuggestion.get(position);
@@ -279,6 +302,8 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 searchView.closeSearch();
+                ((GifDrawable) imgLoading.getDrawable()).reset();
+                imgLoading.setVisibility(View.VISIBLE);
             }
         });
         //搜索栏文本变化事件
@@ -427,6 +452,7 @@ public class MainActivity extends AppCompatActivity {
                     myFragmentPoetry.setMyHelper(myHelper);
                     smartRefreshLayout.autoRefresh();
                 }
+                tv_toolbar_title.setText("唐诗");
                 transaction.replace(R.id.main_frame, myFragmentPoetry);
                 break;
 
@@ -436,6 +462,7 @@ public class MainActivity extends AppCompatActivity {
                     myFragmentPoem.setMyHelper(myHelper);
                     smartRefreshLayout.autoRefresh();
                 }
+                tv_toolbar_title.setText("宋词");
                 transaction.replace(R.id.main_frame, myFragmentPoem);
                 break;
 
@@ -444,6 +471,7 @@ public class MainActivity extends AppCompatActivity {
                     myFragmentAuthor = new MyFragmentAuthor();
                     smartRefreshLayout.autoRefresh();
                 }
+                tv_toolbar_title.setText("作者");
                 transaction.replace(R.id.main_frame, myFragmentAuthor);
                 break;
 
@@ -453,6 +481,7 @@ public class MainActivity extends AppCompatActivity {
                     myFragmentStar.setMyHelper(myHelper);
                     myFragmentStar.setActivity(this);
                 }
+                tv_toolbar_title.setText("收藏");
                 transaction.replace(R.id.main_frame, myFragmentStar);
                 break;
         }
@@ -460,13 +489,19 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    //收藏项被点击
     public void onStarItemClick(Star star) {
         if (star.getType() == 1) {//唐诗
             showFragment(FRAGMENT_POETRY);
+            myFragmentPoetry.setPoetry(null);
             AsyncClient.getPoetry(new RequestParams("id", star.getId()), responseHandler, order);
         } else {//宋词
             showFragment(FRAGMENT_POEM);
+            myFragmentPoem.setPoem(null);
             AsyncClient.getPoem(new RequestParams("id", star.getId()), responseHandler, order);
         }
+        ((GifDrawable) imgLoading.getDrawable()).reset();
+        imgLoading.setVisibility(View.VISIBLE);
+        debug_pause = 2200;
     }
 }

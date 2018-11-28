@@ -17,5 +17,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:text="已登录用户" />
+        android:text="板鸭(已登陆)" />
 </LinearLayout>
