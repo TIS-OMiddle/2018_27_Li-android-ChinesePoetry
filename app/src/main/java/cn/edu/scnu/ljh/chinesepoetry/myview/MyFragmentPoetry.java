@@ -56,6 +56,7 @@ public class MyFragmentPoetry extends Fragment {
                         Toast.makeText(getContext(), "已添加到收藏", Toast.LENGTH_SHORT).show();
                         img.setImageResource(R.drawable.star_yes);
                     }
+                    img.setTag(!((boolean) img.getTag()));
                 }
             });
             poetry_title = rootView.findViewById(R.id.fg_poetry_title);

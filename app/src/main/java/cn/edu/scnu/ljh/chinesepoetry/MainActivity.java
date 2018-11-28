@@ -2,6 +2,8 @@ package cn.edu.scnu.ljh.chinesepoetry;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +35,8 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     Integer order;//异步按序回调
     TextView tv_toolbar_title;//工具栏
     Handler handler;//主线程handler
+    FrameLayout mainFrame;//主页
 
 
     @Override
@@ -91,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         order = 0;
         handler = new Handler();
         myHelper = new MyHelper(this);
+        mainFrame = findViewById(R.id.main_frame);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //toolbar设定
@@ -150,6 +155,29 @@ public class MainActivity extends AppCompatActivity {
         initHandler();
         initRefreshListener();
         initSearchListener();
+
+        //主页特效
+        mainFrame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backgroundTransition();
+            }
+        });
+    }
+
+    Random rand = new Random();
+    //主页背景概率变换
+    private int bg[] = new int[]{R.drawable.bg1, R.drawable.bg2, R.drawable.bg3};
+    private int bg_iter = 0;
+    private void backgroundTransition() {
+        if (rand.nextFloat() < 1) {
+            TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{
+                    getDrawable(bg[(bg_iter++) % 3]),
+                    getDrawable(bg[(bg_iter) % 3])
+            });
+            mainFrame.setBackground(transitionDrawable);
+            transitionDrawable.startTransition(3000);
+        }
     }
 
     //初始化监听器
