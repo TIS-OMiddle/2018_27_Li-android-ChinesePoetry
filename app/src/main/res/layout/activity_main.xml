@@ -60,9 +60,29 @@
                     android:layout_height="match_parent" />
 
                 <FrameLayout
-                    android:id="@+id/main_frame"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent">
+
+                    <FrameLayout
+                        android:id="@+id/main_frame"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg1" />
+
+                    <pl.droidsonroids.gif.GifImageView
+                        android:id="@+id/img_loading"
+                        android:src="@drawable/loading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        android:layout_gravity="center" />
+
+                    <com.github.glomadrian.grav.GravView
+                        android:id="@+id/grav_view"
+                        style="@style/main_frame_grav_ball"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </FrameLayout>
             </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
             <!--搜索-->
@@ -77,8 +97,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:focusable="true"
             android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical">
 
             <!--导航栏-->
@@ -89,6 +109,7 @@
                 android:background="@color/my_navi_body"
                 app:headerLayout="@layout/header"
                 app:insetForeground="@android:color/transparent"
+                app:itemTextColor="@color/my_navi_itemtext"
                 app:menu="@menu/menu_navigation" />
 
         </LinearLayout>

@@ -61,6 +61,12 @@ public class MyFragmentPoem extends Fragment {
     }
 
     public void setPoem(Poem poem) {
+        if (poem == null) {
+            poem_title.setText("");
+            poem_author.setText("");
+            poem_content.setText("");
+            return;
+        }
         poem_title.setText(poem.getTitle());
         poem_author.setText(poem.getAuthor());
         poem_content.setText(poem.getContent().replace('|', '\n'));
