@@ -7,15 +7,17 @@
     android:orientation="vertical">
 
     <cn.edu.scnu.ljh.chinesepoetry.myview.MyCircleImageView
+        android:id="@+id/header_touxiang"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="20dp"
-        android:src="@drawable/touxiang" />
+        android:src="@drawable/touxiang2" />
 
     <TextView
+        android:id="@+id/header_user_text"
         style="@style/UserID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:text="板鸭(已登陆)" />
+        android:text="点击头像登陆" />
 </LinearLayout>

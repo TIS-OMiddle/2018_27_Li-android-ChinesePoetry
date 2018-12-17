@@ -2,6 +2,7 @@ package cn.edu.scnu.ljh.chinesepoetry.myview;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,6 +32,7 @@ public class MyFragmentPoetry extends Fragment {
     private int contentLength = 0;
     private Poetry poetry;
     private MyHelper myHelper;
+    private Typeface tf;
 
     @Nullable
     @Override
@@ -66,6 +68,9 @@ public class MyFragmentPoetry extends Fragment {
             poetry_content[2] = rootView.findViewById(R.id.fg_poetry_content_3);
             poetry_content[3] = rootView.findViewById(R.id.fg_poetry_content_4);
             setInOrderAnimate();
+            for (int i = 0; i < 4; i++) {
+                poetry_content[i].setTypeface(tf);
+            }
         }
         ViewGroup parent = (ViewGroup) rootView.getParent();
         if (parent != null) {
@@ -140,5 +145,9 @@ public class MyFragmentPoetry extends Fragment {
 
     public void setMyHelper(MyHelper myHelper) {
         this.myHelper = myHelper;
+    }
+
+    public void setTf(Typeface tf) {
+        this.tf = tf;
     }
 }

@@ -4,4 +4,14 @@
         <item>com.github.glomadrian.grav.generator.animation.SideToSideAnimator</item>
         <item>com.github.glomadrian.grav.generator.animation.ShakeAnimator</item>
     </string-array>
+    
+    <string-array name="preference_ziti_entries">
+        <item>字体1</item>
+        <item>字体2</item>
+    </string-array>
+    
+    <string-array name="preference_ziti_entries_value">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

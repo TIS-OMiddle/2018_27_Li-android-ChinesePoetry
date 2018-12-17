@@ -1,11 +1,15 @@
 package cn.edu.scnu.ljh.chinesepoetry;
 
 import android.Manifest;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -37,7 +41,9 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,9 +52,11 @@ import cn.edu.scnu.ljh.chinesepoetry.entity.Poem;
 import cn.edu.scnu.ljh.chinesepoetry.entity.Poetry;
 import cn.edu.scnu.ljh.chinesepoetry.entity.PoetryAuthor;
 import cn.edu.scnu.ljh.chinesepoetry.entity.Star;
+import cn.edu.scnu.ljh.chinesepoetry.myview.MyCircleImageView;
 import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentPoem;
 import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentPoetry;
 import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentAuthor;
+import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentSetting;
 import cn.edu.scnu.ljh.chinesepoetry.myview.MyFragmentStar;
 import cn.edu.scnu.ljh.chinesepoetry.service.AsyncClient;
 import cn.edu.scnu.ljh.chinesepoetry.service.MyHelper;
@@ -75,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawer;//抽屉布局
     MaterialSearchView searchView;//搜索显示
     Button bt_nav;//切换显示导航
+    Button bt_back;
     NavigationView navigation;//导航view
     Toolbar toolbar;//工具栏
     List<Poetry> poetriesSuggestion;//搜索建议
@@ -85,8 +94,12 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_toolbar_title;//工具栏
     Handler handler;//主线程handler
     FrameLayout mainFrame;//主页
+    FrameLayout settingFrame;//设置页
     GravView gv;//特效球
-    GifImageView imgLoading;
+    GifImageView imgLoading;//加载动画
+    MyFragmentSetting myFragmentSetting;//设置页面
+    private Map<String, String> userSetting = new HashMap<>();
+    private Typeface tf;//字体2
 
 
     @Override
@@ -97,15 +110,19 @@ public class MainActivity extends AppCompatActivity {
         drawer = findViewById(R.id.drawer);
         searchView = findViewById(R.id.search_view);
         bt_nav = findViewById(R.id.bt_nav);
+        bt_back = findViewById(R.id.bt_back);
         navigation = findViewById(R.id.navigation);
         tv_toolbar_title = findViewById(R.id.tv_toolbar_title);
         order = 0;
         handler = new Handler();
         myHelper = new MyHelper(this);
         mainFrame = findViewById(R.id.main_frame);
+        settingFrame = findViewById(R.id.setting_frame);
         gv = findViewById(R.id.grav_view);
         imgLoading = findViewById(R.id.img_loading);
+        myFragmentSetting = new MyFragmentSetting();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        tf = Typeface.createFromAsset(getAssets(), "no2.ttf");
 
         //toolbar设定
         toolbar = findViewById(R.id.toolbar);
@@ -118,6 +135,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        //设置页面
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.setting_frame, myFragmentSetting);
+        transaction.commit();
+        bt_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawer.closeDrawer(Gravity.END);
+            }
+        });
         //左侧菜单切换按钮
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         bt_nav.setOnClickListener(new View.OnClickListener() {
@@ -143,15 +170,25 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.menu_item_star:
                         showFragment(FRAGMENT_STAR);
                         break;
+                    case R.id.menu_item_setting:
+                        drawer.openDrawer(Gravity.END);
+                        break;
+                    case R.id.menu_item_logout:
+                        SharedPreferences.Editor editor = getSharedPreferences("mysetting", MODE_PRIVATE).edit();
+                        editor.remove("username");
+                        editor.apply();
+                        Toast.makeText(getApplicationContext(), "已退出", Toast.LENGTH_SHORT).show();
+                        MyCircleImageView mc = findViewById(R.id.header_touxiang);
+                        TextView textView = findViewById(R.id.header_user_text);
+                        mc.setImageResource(R.drawable.touxiang2);
+                        textView.setText("点击头像登陆");
+                        break;
                 }
 
                 drawer.closeDrawer(Gravity.START);
                 return false;
             }
         });
-
-        //设置初始fragment
-        showFragment(FRAGMENT_POETRY);
 
         //刷新布局显示设置
         smartRefreshLayout.setEnableHeaderTranslationContent(false);
@@ -160,23 +197,18 @@ public class MainActivity extends AppCompatActivity {
         initHandler();
         initRefreshListener();
         initSearchListener();
+        initUserSetting();
 
         //主页特效
         mainFrame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 backgroundTransition();
-//                //防卡机
-//                gv.setVisibility(View.INVISIBLE);
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mainFrame.setBackground(getDrawable(bg[bg_iter % 3]));
-//                        gv.setVisibility(View.VISIBLE);
-//                    }
-//                }, 2200);
             }
         });
+
+        //设置初始fragment
+        showFragment(FRAGMENT_POETRY);
     }
 
     Random rand = new Random();
@@ -185,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
     private int bg_iter = 0;
 
     private void backgroundTransition() {
+        if (userSetting.get("background").equals("false"))
+            return;
         if (rand.nextFloat() < 1) {
             TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{
                     getDrawable(bg[(bg_iter++) % 3]),
@@ -192,6 +226,19 @@ public class MainActivity extends AppCompatActivity {
             });
             transitionDrawable.startTransition(2000);
             mainFrame.setBackground(transitionDrawable);
+
+            //防卡机
+            if (userSetting.get("youhua").equals("true")) {
+                gv.setVisibility(View.INVISIBLE);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mainFrame.setBackground(getDrawable(bg[bg_iter % 3]));
+                        if (userSetting.get("lizi").equals("true"))
+                            gv.setVisibility(View.VISIBLE);
+                    }
+                }, 2200);
+            }
         }
     }
 
@@ -405,12 +452,51 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //用户设置
+    private void initUserSetting() {
+        SharedPreferences sp = getSharedPreferences("mysetting", MODE_PRIVATE);
+        userSetting.put("ziti", sp.getString("ziti", "1"));
+        userSetting.put("background", String.valueOf(sp.getBoolean("background", true)));
+        userSetting.put("lizi", String.valueOf(sp.getBoolean("lizi", true)));
+        userSetting.put("youhua", String.valueOf(sp.getBoolean("youhua", true)));
+
+        MyCircleImageView myCircleImageView = navigation.getHeaderView(0).findViewById(R.id.header_touxiang);
+        TextView textView = navigation.getHeaderView(0).findViewById(R.id.header_user_text);
+        if (sp.getString("username", null) != null) {
+            myCircleImageView.setImageResource(R.drawable.touxiang);
+            textView.setText(sp.getString("username", null));
+        } else {
+            myCircleImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivityForResult(new Intent(MainActivity.this, LoginActivity.class), 1);
+                }
+            });
+        }
+
+        if (userSetting.get("lizi").equals("false"))
+            gv.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == 2) {
+                MyCircleImageView myCircleImageView = findViewById(R.id.header_touxiang);
+                TextView textView = findViewById(R.id.header_user_text);
+                myCircleImageView.setImageResource(R.drawable.touxiang);
+                textView.setText(data.getStringExtra("username"));
+            }
+        }
+    }
 
     //系统点击返回事件
     @Override
     public void onBackPressed() {
         if (searchView.isSearchOpen()) {
             searchView.closeSearch();
+        } else if (drawer.isDrawerOpen(Gravity.END)) {
+            drawer.closeDrawer(Gravity.END);
         } else {
             super.onBackPressed();
         }
@@ -450,6 +536,8 @@ public class MainActivity extends AppCompatActivity {
                 if (myFragmentPoetry == null) {
                     myFragmentPoetry = new MyFragmentPoetry();
                     myFragmentPoetry.setMyHelper(myHelper);
+                    if (userSetting.get("ziti").equals("2"))
+                        myFragmentPoetry.setTf(tf);
                     smartRefreshLayout.autoRefresh();
                 }
                 tv_toolbar_title.setText("唐诗");
@@ -460,6 +548,8 @@ public class MainActivity extends AppCompatActivity {
                 if (myFragmentPoem == null) {
                     myFragmentPoem = new MyFragmentPoem();
                     myFragmentPoem.setMyHelper(myHelper);
+                    if (userSetting.get("ziti").equals("2"))
+                        myFragmentPoem.setTf(tf);
                     smartRefreshLayout.autoRefresh();
                 }
                 tv_toolbar_title.setText("宋词");

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="show"
+        android:title="显示设置">
+        <ListPreference
+            android:key="ziti"
+            android:summary="设置诗词中的字体"
+            android:title="字体"
+            android:entries="@array/preference_ziti_entries"
+            android:entryValues="@array/preference_ziti_entries_value"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="texiao"
+        android:summary="个人信息"
+        android:title="特效设置">
+        <SwitchPreference
+            android:key="background"
+            android:summary="是否允许背景渐变"
+            android:title="渐变背景"/>
+        <SwitchPreference
+            android:key="lizi"
+            android:summary="是否开启背景中的气泡浮动"
+            android:title="粒子特效"/>
+        <SwitchPreference
+            android:key="youhua"
+            android:summary="开启特效优化，有些特效某些时刻可能不播放"
+            android:title="优化"/>
+    </PreferenceCategory>
+</PreferenceScreen>
