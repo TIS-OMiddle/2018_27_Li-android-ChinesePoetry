@@ -1,23 +1,9 @@
 package cn.edu.scnu.ljh.chinesepoetry;
 
-import android.content.Context;
-import android.support.design.widget.NavigationView;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.NavigationViewActions;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
-import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,15 +11,16 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openContextualActionModeOverflowMenu;
-import static android.support.test.espresso.action.ViewActions.*;
-import static android.support.test.espresso.matcher.ViewMatchers.*;
-import static android.support.test.espresso.assertion.ViewAssertions.*;
-import static org.hamcrest.Matchers.allOf;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -78,9 +65,9 @@ public class ExampleInstrumentedTest {
     public void testStashClick() throws InterruptedException {
         onView(withId(R.id.bt_nav)).perform(click());
         onView(withId(R.id.navigation)).perform(NavigationViewActions.navigateTo(R.id.menu_item_star));
-        onData(is(instanceOf(String.class)))
+        onData(anything())
                 .inAdapterView(withId(R.id.fg_star_lv))
-                .atPosition(0)
+                .atPosition(1)
                 .perform(click());
         Thread.sleep(3000);
         onView(withId(R.id.fg_poetry_title)).check(matches(isDisplayed()));
