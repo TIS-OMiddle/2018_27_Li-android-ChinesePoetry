@@ -21,5 +21,5 @@
     <li><del>特效</del></li>
     <li>娱乐彩蛋</li>
     <li><del>调样式、背景</del></li>
-    <li>登陆<del>(应该不做后台了，死代码定好ui)</del></li>
+    <li><del>登陆(不做了，死代码定好ui)</del></li>
 </ul>
