@@ -6,6 +6,11 @@
 转换脚本:<a href="https://github.com/KomaBeyond/chinese-poetry-mysql">chinese-poetry-mysql</a>
 <h3>后台API:</h3><a href="https://github.com/TIS-OMiddle/2018_27_Li-API-springboot">2018_27_Li-API-springboot</a> ，springboot做的简单接口
 <br>
+<h2>效果</h2>
+<img width="530" height="940" src="演示/01.gif"><br>
+<img width="530" height="940" src="演示/02.gif"><br>
+<img width="530" height="940" src="演示/03.gif"><br>
+<br>
 <br>
 <h3>todo-list:</h3>
 <ul>
